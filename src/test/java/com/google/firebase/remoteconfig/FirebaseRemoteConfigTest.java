@@ -27,7 +27,9 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.TestOnlyImplFirebaseTrampolines;
 import com.google.firebase.auth.MockGoogleCredentials;
+
 import java.util.concurrent.ExecutionException;
+
 import org.junit.After;
 import org.junit.Test;
 
@@ -113,6 +115,8 @@ public class FirebaseRemoteConfigTest {
 
   private static final String TEST_ETAG = "etag-123456789012-1";
 
+  // Get template tests
+
   @Test
   public void testGetTemplate() throws FirebaseRemoteConfigException {
     MockRemoteConfigClient client = MockRemoteConfigClient.fromTemplate(
@@ -154,6 +158,100 @@ public class FirebaseRemoteConfigTest {
 
     try {
       remoteConfig.getTemplateAsync().get();
+    } catch (ExecutionException e) {
+      assertSame(TEST_EXCEPTION, e.getCause());
+    }
+  }
+
+  // Get template with version number tests
+
+  @Test
+  public void testGetTemplateAtVersionWithStringValue() throws FirebaseRemoteConfigException {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromTemplate(
+            new Template().setETag(TEST_ETAG));
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    Template template = remoteConfig.getTemplateAtVersion("64");
+
+    assertEquals(TEST_ETAG, template.getETag());
+  }
+
+  @Test
+  public void testGetTemplateAtVersionWithStringValueFailure() {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromException(TEST_EXCEPTION);
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    try {
+      remoteConfig.getTemplateAtVersion("55");
+    } catch (FirebaseRemoteConfigException e) {
+      assertSame(TEST_EXCEPTION, e);
+    }
+  }
+
+  @Test
+  public void testGetTemplateAtVersionAsyncWithStringValue() throws Exception {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromTemplate(
+            new Template().setETag(TEST_ETAG));
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    Template template = remoteConfig.getTemplateAtVersionAsync("55").get();
+
+    assertEquals(TEST_ETAG, template.getETag());
+  }
+
+  @Test
+  public void testGetTemplateAtVersionAsyncWithStringValueFailure() throws InterruptedException {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromException(TEST_EXCEPTION);
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    try {
+      remoteConfig.getTemplateAtVersionAsync("55").get();
+    } catch (ExecutionException e) {
+      assertSame(TEST_EXCEPTION, e.getCause());
+    }
+  }
+
+  @Test
+  public void testGetTemplateAtVersionWithLongValue() throws FirebaseRemoteConfigException {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromTemplate(
+            new Template().setETag(TEST_ETAG));
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    Template template = remoteConfig.getTemplateAtVersion(64L);
+
+    assertEquals(TEST_ETAG, template.getETag());
+  }
+
+  @Test
+  public void testGetTemplateAtVersionWithLongValueFailure() {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromException(TEST_EXCEPTION);
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    try {
+      remoteConfig.getTemplateAtVersion(55L);
+    } catch (FirebaseRemoteConfigException e) {
+      assertSame(TEST_EXCEPTION, e);
+    }
+  }
+
+  @Test
+  public void testGetTemplateAtVersionAsyncWithLongValue() throws Exception {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromTemplate(
+            new Template().setETag(TEST_ETAG));
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    Template template = remoteConfig.getTemplateAtVersionAsync(55L).get();
+
+    assertEquals(TEST_ETAG, template.getETag());
+  }
+
+  @Test
+  public void testGetTemplateAtVersionAsyncWithLongValueFailure() throws InterruptedException {
+    MockRemoteConfigClient client = MockRemoteConfigClient.fromException(TEST_EXCEPTION);
+    FirebaseRemoteConfig remoteConfig = getRemoteConfig(client);
+
+    try {
+      remoteConfig.getTemplateAtVersionAsync(55L).get();
     } catch (ExecutionException e) {
       assertSame(TEST_EXCEPTION, e.getCause());
     }

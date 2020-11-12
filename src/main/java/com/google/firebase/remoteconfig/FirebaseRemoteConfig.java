@@ -100,6 +100,151 @@ public final class FirebaseRemoteConfig {
     };
   }
 
+  /**
+   * Gets the requested version of the of the Remote Config template.
+   *
+   * @param versionNumber The version number of the Remote Config template to look up.
+   * @return A {@link Template}.
+   * @throws FirebaseRemoteConfigException If an error occurs while getting the template.
+   */
+  public Template getTemplateAtVersion(String versionNumber) throws FirebaseRemoteConfigException {
+    return getTemplateAtVersionOp(versionNumber).call();
+  }
+
+  /**
+   * Gets the requested version of the of the Remote Config template.
+   *
+   * @param versionNumber The version number of the Remote Config template to look up.
+   * @return A {@link Template}.
+   * @throws FirebaseRemoteConfigException If an error occurs while getting the template.
+   */
+  public Template getTemplateAtVersion(long versionNumber) throws FirebaseRemoteConfigException {
+    String versionNumberString = String.valueOf(versionNumber);
+    return getTemplateAtVersionOp(versionNumberString).call();
+  }
+
+  /**
+   * Similar to {@link #getTemplateAtVersion(String versionNumber)} but performs the operation
+   * asynchronously.
+   *
+   * @param versionNumber The version number of the Remote Config template to look up.
+   * @return An {@code ApiFuture} that completes with a {@link Template} when
+   *     the requested template is available.
+   */
+  public ApiFuture<Template> getTemplateAtVersionAsync(String versionNumber) {
+    return getTemplateAtVersionOp(versionNumber).callAsync(app);
+  }
+
+  /**
+   * Similar to {@link #getTemplateAtVersion(long versionNumber)} but performs the operation
+   * asynchronously.
+   *
+   * @param versionNumber The version number of the Remote Config template to look up.
+   * @return An {@code ApiFuture} that completes with a {@link Template} when
+   *     the requested template is available.
+   */
+  public ApiFuture<Template> getTemplateAtVersionAsync(long versionNumber) {
+    String versionNumberString = String.valueOf(versionNumber);
+    return getTemplateAtVersionOp(versionNumberString).callAsync(app);
+  }
+
+  private CallableOperation<Template, FirebaseRemoteConfigException> getTemplateAtVersionOp(
+          final String versionNumber) {
+    final FirebaseRemoteConfigClient remoteConfigClient = getRemoteConfigClient();
+    return new CallableOperation<Template, FirebaseRemoteConfigException>() {
+      @Override
+      protected Template execute() throws FirebaseRemoteConfigException {
+        return remoteConfigClient.getTemplateAtVersion(versionNumber);
+      }
+    };
+  }
+
+  /**
+   * Publishes a Remote Config template.
+   *
+   * @param template The Remote Config template to be published.
+   * @return The published {@link Template}.
+   * @throws FirebaseRemoteConfigException If an error occurs while publishing the template.
+   */
+  public Template publishTemplate(Template template) throws FirebaseRemoteConfigException {
+    return publishTemplateOp(template, false, false).call();
+  }
+
+  /**
+   * Similar to {@link #publishTemplate(Template template)} but performs the operation
+   * asynchronously.
+   *
+   * @param template The Remote Config template to be published.
+   * @return An {@code ApiFuture} that completes with a {@link Template} when
+   *     the provided template is published.
+   */
+  public ApiFuture<Template> publishTemplateAsync(Template template) {
+    return publishTemplateOp(template, false, false).callAsync(app);
+  }
+
+  /**
+   * Validates a Remote Config template.
+   *
+   * @param template The Remote Config template to be validated.
+   * @return The validated {@link Template}.
+   * @throws FirebaseRemoteConfigException If an error occurs while validating the template.
+   */
+  public Template validateTemplate(Template template) throws FirebaseRemoteConfigException {
+    return publishTemplateOp(template, true, false).call();
+  }
+
+  /**
+   * Similar to {@link #validateTemplate(Template template)} but performs the operation
+   * asynchronously.
+   *
+   * @param template The Remote Config template to be validated.
+   * @return An {@code ApiFuture} that completes with a {@link Template} when
+   *     the provided template is validated.
+   */
+  public ApiFuture<Template> validateTemplateAsync(Template template) {
+    return publishTemplateOp(template, true, false).callAsync(app);
+  }
+
+  /**
+   * Force publishes a Remote Config template.
+   *
+   * <p>This method forces the Remote Config template to be updated and circumvent the ETag.
+   * This approach is not recommended because it risks causing the loss of updates to your
+   * Remote Config template if multiple clients are updating the Remote Config template.
+   * See <a href="https://firebase.google.com/docs/remote-config/use-config-rest#etag_usage_and_forced_updates">
+   * ETag usage and forced updates</a>.
+   *
+   * @param template The Remote Config template to be forcefully published.
+   * @return The published {@link Template}.
+   * @throws FirebaseRemoteConfigException If an error occurs while publishing the template.
+   */
+  public Template forcePublishTemplate(Template template) throws FirebaseRemoteConfigException {
+    return publishTemplateOp(template, false, true).call();
+  }
+
+  /**
+   * Similar to {@link #forcePublishTemplate(Template template)} but performs the operation
+   * asynchronously.
+   *
+   * @param template The Remote Config template to be forcefully published.
+   * @return An {@code ApiFuture} that completes with a {@link Template} when
+   *     the provided template is published.
+   */
+  public ApiFuture<Template> forcePublishTemplateAsync(Template template) {
+    return publishTemplateOp(template, false, true).callAsync(app);
+  }
+
+  private CallableOperation<Template, FirebaseRemoteConfigException> publishTemplateOp(
+          final Template template, final boolean validateOnly, final boolean forcePublish) {
+    final FirebaseRemoteConfigClient remoteConfigClient = getRemoteConfigClient();
+    return new CallableOperation<Template, FirebaseRemoteConfigException>() {
+      @Override
+      protected Template execute() throws FirebaseRemoteConfigException {
+        return remoteConfigClient.publishTemplate(template, validateOnly, forcePublish);
+      }
+    };
+  }
+
   @VisibleForTesting
   FirebaseRemoteConfigClient getRemoteConfigClient() {
     return remoteConfigClient;

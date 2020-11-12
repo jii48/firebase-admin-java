@@ -46,11 +46,8 @@ import com.google.firebase.testing.TestResponseInterceptor;
 import com.google.firebase.testing.TestUtils;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.TimeZone;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -280,6 +277,29 @@ public class FirebaseRemoteConfigClientImplTest {
                 RemoteConfigErrorCode.INVALID_ARGUMENT, "[INVALID_ARGUMENT]: test error");
       }
       checkGetRequestHeader(interceptor.getLastRequest());
+    }
+  }
+
+  // Test getTemplateAtVersion
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testGetTemplateAtVersionWithNullString() throws Exception {
+    client.getTemplateAtVersion(null);
+  }
+
+  @Test
+  public void testGetTemplateAtVersionWithInvalidString() throws Exception {
+    List<String> invalidTopicNames = ImmutableList
+            .of("", " ", "abc", "t123", "123t", "t123t", "12t3", "#$*&^", "-123", "+123", "123.4");
+
+    for (String topicName : invalidTopicNames) {
+      try {
+        client.getTemplateAtVersion(topicName);
+        fail("No error thrown for invalid version number");
+      } catch (IllegalArgumentException expected) {
+        String message = "Version number must be a non-empty string in int64 format.";
+        assertEquals(message, expected.getMessage());
+      }
     }
   }
 
